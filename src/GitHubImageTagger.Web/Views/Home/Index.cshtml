@@ -1,0 +1,188 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    /* From http://stackoverflow.com/a/18839305/390192 */
+    .form-control-addon {
+        /*position: relative;*/
+    }
+
+    .form-control-addon .fa {
+        position: absolute;
+        padding: 10px;
+        pointer-events: none;
+    }
+
+    /* align icon */
+    .left-addon .fa  { left:  15px; top: 22px; }
+    .right-addon .fa { right: 15px; top: 22px; }
+
+    /* add padding  */
+    .left-addon input  { padding-left:  30px; }
+    .right-addon input { padding-right: 30px; }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group form-control-addon right-addon" style="margin: 1rem 0rem 1rem 0rem;">
+            <input id="tagSearchBox" type="text" class="form-control form-control-lg tagSearchBox" placeholder="Search @(ViewBag.TaggedImageCount) tagged images..." />
+            <i id="searchSpinner" class="fa fa-cog fast-right-spinner" style="display: none;"></i>
+        </div>
+        <p id="searchResult"></p>
+    </div>
+</div>
+
+<div id="resultsRow" class="card-columns"></div>
+
+<div id="imageTemplate" class="card imageBox" style="display: none;">
+    <img class="card-img-top" style="width: 100%;" />
+    <span id="imageTagsTemplate" class="card-block"></span>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#tagSearchBox").focus();
+    });
+
+    // http://stackoverflow.com/a/5926782/390192
+    var searchTimer;
+    var searchDoneInterval = 500;
+
+    $("#tagSearchBox").keyup(function () {
+        clearTimeout(searchTimer);
+        if ($("#tagSearchBox").val()) {
+            searchTimer = setTimeout(doSearch, searchDoneInterval);
+        }
+    });
+
+    function doSearch() {
+        $("#searchSpinner").show();
+        var terms = $("#tagSearchBox").val();
+
+        if (terms) {
+            $.ajax("/api/tags/search", {
+                type: "GET",
+                data: { terms: terms },
+                success: function (data, status, xhr) {
+                    $("#searchResult").html("Got back " + data.length + " results!");
+                    $("#resultsRow").html("");
+
+                    data.forEach(function (item, index) {
+                        var template = $("#imageTemplate").clone();
+                        template.attr("id", "imageBox" + item.imageId);
+                        template.find("img").first().attr("src", item.url);
+                        template.append("<a id='addTagLink" + item.imageId + "' role='button' class='' onclick='showAddTagToImage(this, " + item.imageId + ")'><i class='fa fa-plus imageAddTagIcon'></i></a>");
+                        var tagsTemplate = template.children("#imageTagsTemplate");
+                        tagsTemplate.attr("id", "imageTags" + item.imageId);
+
+                        $("#resultsRow").append(template);
+                        getTagsForImage(item.imageId);
+                        template.css("display", "inline-block");
+                    });
+
+                    $("#searchSpinner").hide();
+                },
+                error: function (xhr, status, error) {
+                    $("#searchResult").html("Error " + status + " calling API: " + error);
+                    $("#searchSpinner").hide();
+                }
+            });
+        }
+    }
+
+    function getTagsForImage(imageId) {
+        $.ajax("/api/images/tags/" + imageId, {
+            type: "GET",
+            success: function (data, status, xhr) {
+                data.forEach(function (item, index) {
+                    $("#imageTags" + imageId).append("<span class='tag tag-default tagBadge'>" + item.content + "<span class='tagBadgeLinkContainer'> <a id='tagUpdateLink" + item.tagId + "' role='button' class='tabBadgeLink tabBadgeLinkEdit'onclick='showUpdateTag(this, " + imageId + ", " + item.tagId + ")'><i class='fa fa-pencil'></i></a> <a role='button' class='tabBadgeLink tabBadgeLinkRemove' onclick='removeTag(" + imageId + ", " + item.tagId + ")'><i class='fa fa-remove'></i></a></span></span>");
+                });
+            }
+        });
+    }
+
+    function reloadTags(imageId) {
+        $("#imageTags" + imageId).empty();
+        getTagsForImage(imageId);
+    }
+
+    function removeTag(imageId, tagId) {
+        $.ajax("/api/tags/" + tagId, {
+            type: "DELETE",
+            success: function (data, status, xhr) {
+                reloadTags(imageId);
+            },
+            error: function (xhr, status, error) {
+                alert("Error " + status + " calling API: " + error);
+            }
+        });
+    }
+
+    function showUpdateTag(element, imageId, tagId) {
+        var parent = $(element).parent().parent();
+        if (!parent.data("bs.popover")) {
+            var template = "<div class='input-group'><input id='tagUpdateBox" + tagId + "' type='text' class='form-control tagBox' value='" + parent.text().trim() + "' /><span class='input-group-btn'><button id='tagUpdateSubmitBtn" + tagId + "' class='btn btn-default' type='button' onclick='updateTag(" + tagId + ", " + imageId + ")'><i class='fa fa-check'></i></button></span></div>";
+            parent.popover({ content: template, html: true, trigger: "focus" });
+        }
+        parent.popover('toggle');
+    }
+
+    function updateTag(tagId, imageId) {
+        var tag = $("#tagUpdateBox" + tagId).val();
+        var element = $("#tagUpdateLink" + tagId).parent().parent();
+
+        if (tag !== "") {
+            $("#tagUpdateBox" + tagId).prop('disabled', true);
+            $("#tagUpdateSubmitBtn" + tagId).prop('disabled', true);
+
+            $.ajax("/api/tags/" + tagId, {
+                method: "PUT",
+                data: JSON.stringify(tag),
+                contentType: "application/json",
+                success: function (data, status, xhr) {
+                    $("#tagUpdateSubmitBtn" + imageId).css('color', 'limegreen');
+                    element.popover("dispose");
+                    reloadTags(imageId);
+                },
+                error: function (xhr, status, error) {
+                    element.popover("dispose");
+                    alert("Error trying to update the tag: " + status + " - " + error);
+                }
+            });
+        }
+    }
+
+    function showAddTagToImage(element, imageId) {
+        if (!$(element).data("bs.popover")) {
+            var template = "<div class='input-group'><input id='tagBox" + imageId + "' type='text' class='form-control tagBox' placeholder='Enter tags, comma separated.' /><span class='input-group-btn'><button id='tagSubmitBtn" + imageId + "' class='btn btn-default' type='button' onclick='submitTags(" + imageId + ")'><i class='fa fa-check'></i></button></span></div>";
+            $(element).popover({ content: template, html: true, placement: "top", trigger: "focus" });
+        }
+        $(element).popover('toggle');
+    }
+
+    function submitTags(imageId) {
+        var tags = $("#tagBox" + imageId).val();
+
+        if (tags !== "") {
+            var data = { tags: tags, imageId: imageId };
+            $("#tagBox" + imageId).prop('disabled', true);
+            $("#tagSubmitBtn" + imageId).prop('disabled', true);
+
+            $.ajax("/api/tags", {
+                type: "POST",
+                data: data,
+                success: function (data, status, xhr) {
+                    $("#tagSubmitBtn" + imageId).css('color', 'limegreen');
+                    $("#addTagLink" + imageId).popover('dispose');
+                    reloadTags(imageId);
+                },
+                error: function (xhr, status, error) {
+                    console.log("error submitting tags: " + error);
+                    $("#tagSubmitBtn" + imageId).css('color', 'red');
+                    $("#addTagLink" + imageId).popover('dispose');
+                }
+            });
+        }
+    }
+</script>

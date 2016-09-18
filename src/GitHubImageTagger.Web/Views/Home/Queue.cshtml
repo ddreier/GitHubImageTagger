@@ -1,0 +1,48 @@
+﻿@using GitHubImageTagger.Core.Models
+
+<script>
+    function submitTags(imageId) {
+        var tags = $("#tagBox" + imageId).val();
+        var data = { tags: tags, imageId: imageId };
+
+        $("#tagBox" + imageId).prop('disabled', true);
+        $("#tagSubmitBtn" + imageId).prop('disabled', true);
+
+        if (tags !== "") {
+            $.ajax("/api/tags", {
+                type: "POST",
+                data: data,
+                success: function (data, status, xhr) {
+                    $("#tagSubmitBtn" + imageId).css('color', 'limegreen');
+                },
+                error: function (xhr, status, error) {
+                    console.log("error submitting tags: " + error);
+                    $("#tagSubmitBtn" + imageId).css('color', 'red');
+                }
+            });
+        }
+    }
+</script>
+
+<style>
+
+</style>
+
+<h1 style="margin-top: 1rem; margin-bottom: 1rem;">Here's 15 untagged images</h1>
+
+<div class="card-columns">
+    @foreach (Image img in ViewBag.Images)
+    {
+        <div class="card imageBox" style="display: inline-block;">
+            <img class="card-img-top" style="width: 100%;" src="@img.Url" />
+            <div class="card-block tagControls" style="padding: .5rem;">
+                <div class="input-group">
+                    <input id="tagBox@(img.ImageId)" type="text" class="form-control tagBox" placeholder="Enter tags, comma separated." />
+                    <span class="input-group-btn">
+                        <button id="tagSubmitBtn@(img.ImageId)" class="btn btn-default" type="button" onclick="submitTags(@(img.ImageId))"><i class="fa fa-check"></i></button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
