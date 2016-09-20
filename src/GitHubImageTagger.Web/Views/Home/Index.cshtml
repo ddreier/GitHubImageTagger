@@ -36,8 +36,10 @@
 <div id="resultsRow" class="card-columns"></div>
 
 <div id="imageTemplate" class="card imageBox" style="display: none;">
-    <img class="card-img-top" style="width: 100%;" />
-    <span id="imageTagsTemplate" class="card-block"></span>
+    <div class="card-block" style="padding: .5rem;">
+        <img class="card-img-top" style="width: 100%;" />
+        <span id="imageTagsTemplate"></span>
+    </div>
 </div>
 
 <script>
@@ -72,8 +74,8 @@
                         var template = $("#imageTemplate").clone();
                         template.attr("id", "imageBox" + item.imageId);
                         template.find("img").first().attr("src", item.url);
-                        template.append("<a id='addTagLink" + item.imageId + "' role='button' class='' onclick='showAddTagToImage(this, " + item.imageId + ")'><i class='fa fa-plus imageAddTagIcon'></i></a>");
-                        var tagsTemplate = template.children("#imageTagsTemplate");
+                        template.children("div.card-block").append("<a id='addTagLink" + item.imageId + "' role='button' class='addTagLink' onclick='showAddTagToImage(this, " + item.imageId + ")'><i class='fa fa-plus imageAddTagIcon'></i></a>");
+                        var tagsTemplate = template.find("#imageTagsTemplate");
                         tagsTemplate.attr("id", "imageTags" + item.imageId);
 
                         $("#resultsRow").append(template);

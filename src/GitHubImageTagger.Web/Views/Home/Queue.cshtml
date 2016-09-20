@@ -34,9 +34,9 @@
     @foreach (Image img in ViewBag.Images)
     {
         <div class="card imageBox" style="display: inline-block;">
-            <img class="card-img-top" style="width: 100%;" src="@img.Url" />
             <div class="card-block tagControls" style="padding: .5rem;">
-                <div class="input-group">
+                <img class="card-img-top" style="width: 100%;" src="@img.Url" />
+                <div class="input-group" style="margin-top: .5rem;">
                     <input id="tagBox@(img.ImageId)" type="text" class="form-control tagBox" placeholder="Enter tags, comma separated." />
                     <span class="input-group-btn">
                         <button id="tagSubmitBtn@(img.ImageId)" class="btn btn-default" type="button" onclick="submitTags(@(img.ImageId))"><i class="fa fa-check"></i></button>

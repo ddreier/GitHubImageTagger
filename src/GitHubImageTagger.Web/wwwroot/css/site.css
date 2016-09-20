@@ -100,9 +100,10 @@ textarea {
 .tagBadge {
     background-color: #444;
     margin: 2px 2px 0px 0px;
+    font-weight: normal;
 }
 .tagBadge:hover {
-    background-color: #555;
+    /*background-color: #555;*/
 }
 .tagBadge:hover .tagBadgeLinkContainer {
     display: inline;
@@ -122,4 +123,8 @@ textarea {
 
 .tabBadgeLinkRemove:hover {
     color: red;
+}
+
+.addTagLink {
+    color: #0275d8 !important;
 }
