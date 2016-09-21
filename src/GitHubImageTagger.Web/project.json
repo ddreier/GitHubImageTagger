@@ -57,7 +57,8 @@
       "Areas/**/Views",
       "appsettings.json",
       "hosting.json",
-      "web.config"
+      "web.config",
+      "LICENSE"
     ]
   },
 
