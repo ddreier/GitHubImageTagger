@@ -45,6 +45,18 @@
 <script>
     $(document).ready(function () {
         $("#tagSearchBox").focus();
+
+        if (window.location.hash.length > 1) {
+            $("#tagSearchBox").val(window.location.hash.substr(1));
+            doSearch();
+        }
+    });
+
+    $(window).on('hashchange', function () {
+        if (window.location.hash.length > 1) {
+            $("#tagSearchBox").val(window.location.hash.substr(1));
+            doSearch();
+        }
     });
 
     // http://stackoverflow.com/a/5926782/390192
@@ -98,7 +110,7 @@
             type: "GET",
             success: function (data, status, xhr) {
                 data.forEach(function (item, index) {
-                    $("#imageTags" + imageId).append("<span class='tag tag-default tagBadge'>" + item.content + "<span class='tagBadgeLinkContainer'> <a id='tagUpdateLink" + item.tagId + "' role='button' class='tabBadgeLink tabBadgeLinkEdit'onclick='showUpdateTag(this, " + imageId + ", " + item.tagId + ")'><i class='fa fa-pencil'></i></a> <a role='button' class='tabBadgeLink tabBadgeLinkRemove' onclick='removeTag(" + imageId + ", " + item.tagId + ")'><i class='fa fa-remove'></i></a></span></span>");
+                    $("#imageTags" + imageId).append("<span class='tag tag-default tagBadge'><a class='tagLink' href='#" + item.content + "'>" + item.content + "</a><span class='tagBadgeLinkContainer'> <a id='tagUpdateLink" + item.tagId + "' role='button' class='tagBadgeLink'onclick='showUpdateTag(this, " + imageId + ", " + item.tagId + ")'><i class='fa fa-pencil tagBadgeLinkEdit'></i></a> <a role='button' class='tagBadgeLink' onclick='removeTag(" + imageId + ", " + item.tagId + ")'><i class='fa fa-remove tagBadgeLinkRemove'></i></a></span></span>");
                 });
             }
         });

@@ -83,8 +83,7 @@ textarea {
 }
 
 .imageAddTagIcon {
-    top: 3px;
-    /*margin-left: 2px;*/
+    margin-left: -2px;
 }
 
 .tagBox {
@@ -113,18 +112,25 @@ textarea {
     display: none;
 }
 
-.tabBadgeLink {
+.tagBadgeLink {
     color: #fff;
 }
- 
-.tabBadgeLinkEdit:hover {
+
+.tagBadgeLinkEdit:hover {
     color: gold;
 }
 
-.tabBadgeLinkRemove:hover {
+.tagBadgeLinkRemove:hover {
     color: red;
 }
 
 .addTagLink {
     color: #0275d8 !important;
+}
+
+.tagLink {
+    color: white;
+}
+.tagLink:hover {
+    color: white;
 }
