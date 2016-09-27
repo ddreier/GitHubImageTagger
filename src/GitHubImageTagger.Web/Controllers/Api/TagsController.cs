@@ -43,7 +43,7 @@ namespace GitHubImageTagger.Controllers.Api
 
             string[] splitTerms = terms.ToLower().Trim().Split(delimiters);
 
-            var results = _context.Tags.Where(t => splitTerms.Any(s => t.Content.Contains(s))).Select(t => t.Image).Distinct();
+            var results = _context.Tags.Where(t => splitTerms.Any(s => t.Content.Contains(s))).Select(t => t.Image).Distinct().Include(i => i.Tags);
 
             return results;
         }

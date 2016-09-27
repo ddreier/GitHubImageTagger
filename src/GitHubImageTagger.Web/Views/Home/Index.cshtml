@@ -33,7 +33,22 @@
     </div>
 </div>
 
-<div id="resultsRow" class="card-columns"></div>
+<div id="resultsRow" class="card-columns" data-bind="foreach: images">
+    <div class="card imageBox">
+        <div class="card-block" style="padding: .5rem;">
+            <img class="card-img-top" style="width: 100%" data-bind="attr: { src: url }" />
+            <span data-bind="foreach: tags">
+                <span class='tag tag-default tagBadge'>
+                    <a class='tagLink' data-bind="text: content, attr: { href: '#' + content }"></a>
+                    <span class='tagBadgeLinkContainer'>
+                        <a role='button' class='tagBadgeLink' onclick='showUpdateTag(this, imageId, item.tagId)'><i class='fa fa-pencil tagBadgeLinkEdit'></i></a>
+                        <a role='button' class='tagBadgeLink' onclick='removeTag(imageId, item.tagId)'><i class='fa fa-remove tagBadgeLinkRemove'></i></a>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+</div>
 
 <div id="imageTemplate" class="card imageBox" style="display: none;">
     <div class="card-block" style="padding: .5rem;">
@@ -75,33 +90,36 @@
         var terms = $("#tagSearchBox").val();
 
         if (terms) {
-            $.ajax("/api/tags/search", {
-                type: "GET",
-                data: { terms: terms },
-                success: function (data, status, xhr) {
-                    $("#searchResult").html("Got back " + data.length + " results!");
-                    $("#resultsRow").html("");
+            viewModel.populateImages(terms);
+            //$.ajax("/api/tags/search", {
+            //    type: "GET",
+            //    data: { terms: terms },
+            //    success: function (data, status, xhr) {
+            //        $("#searchResult").html("Got back " + data.length + " results!");
+            //        viewModel.images(data);
+            //        viewModel.populateImageTags();
+            //        //$("#resultsRow").html("");
 
-                    data.forEach(function (item, index) {
-                        var template = $("#imageTemplate").clone();
-                        template.attr("id", "imageBox" + item.imageId);
-                        template.find("img").first().attr("src", item.url);
-                        template.children("div.card-block").append("<a id='addTagLink" + item.imageId + "' role='button' class='addTagLink' onclick='showAddTagToImage(this, " + item.imageId + ")'><i class='fa fa-plus imageAddTagIcon'></i></a>");
-                        var tagsTemplate = template.find("#imageTagsTemplate");
-                        tagsTemplate.attr("id", "imageTags" + item.imageId);
+            //        //data.forEach(function (item, index) {
+            //        //    var template = $("#imageTemplate").clone();
+            //        //    template.attr("id", "imageBox" + item.imageId);
+            //        //    template.find("img").first().attr("src", item.url);
+            //        //    template.children("div.card-block").append("<a id='addTagLink" + item.imageId + "' role='button' class='addTagLink' onclick='showAddTagToImage(this, " + item.imageId + ")'><i class='fa fa-plus imageAddTagIcon'></i></a>");
+            //        //    var tagsTemplate = template.find("#imageTagsTemplate");
+            //        //    tagsTemplate.attr("id", "imageTags" + item.imageId);
 
-                        $("#resultsRow").append(template);
-                        getTagsForImage(item.imageId);
-                        template.css("display", "inline-block");
-                    });
+            //        //    $("#resultsRow").append(template);
+            //        //    getTagsForImage(item.imageId);
+            //        //    template.css("display", "inline-block");
+            //        //});
 
-                    $("#searchSpinner").hide();
-                },
-                error: function (xhr, status, error) {
-                    $("#searchResult").html("Error " + status + " calling API: " + error);
-                    $("#searchSpinner").hide();
-                }
-            });
+            //        $("#searchSpinner").hide();
+            //    },
+            //    error: function (xhr, status, error) {
+            //        $("#searchResult").html("Error " + status + " calling API: " + error);
+            //        $("#searchSpinner").hide();
+            //    }
+            //});
         }
     }
 
@@ -200,3 +218,5 @@
         }
     }
 </script>
+
+<script src="~/js/SearchViewModel.js"></script>
