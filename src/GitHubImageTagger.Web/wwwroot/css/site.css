@@ -105,13 +105,13 @@ textarea {
 .tagBadge:hover {
     /*background-color: #555;*/
 }
-.tagBadge:hover .tagBadgeLinkContainer {
+/*.tagBadge:hover .tagBadgeLinkContainer {
     display: inline;
-}
+}*/
 
-.tagBadgeLinkContainer {
+/*.tagBadgeLinkContainer {
     display: none;
-}
+}*/
 
 .tagBadgeLink {
     color: #fff;
