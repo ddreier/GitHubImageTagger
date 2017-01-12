@@ -6,6 +6,9 @@
     self.newTags = ko.observable();
     self.showNewTag = ko.observable(false);
     self.newTagStatusColor = ko.observable();
+    self.editingTag = ko.observable({ content: '' });
+    self.showEditTag = ko.observable(false);
+    self.editTagStatusColor = ko.observable();
 
     self.deleteTag = function (tag) {
         console.debug(tag);
@@ -20,7 +23,39 @@
         });
     };
 
+    self.editTag = function () {
+        $.ajax("/api/tags/" + self.editingTag().tagId, {
+            method: "PUT",
+            data: JSON.stringify(self.editingTag().content),
+            contentType: "application/json",
+            success: function (img) {
+                self.showEditTag(false);
+                self.populateTags();
+            }
+        });
+    }
+
+    self.editTagKeyUp = function (data, event) {
+        //console.debug(event);
+        if (event.keyCode === 13) {
+            self.editTag();
+        }
+    }
+
+    self.populateTags = function () {
+        $.getJSON("/api/images/tags/" + self.imageId,
+                function (data) {
+                    self.tags(data);
+                }
+            );
+    }
+
     self.toggleShowNewTag = function () { self.showNewTag(!self.showNewTag()) };
+
+    self.toggleShowEditTag = function (tag) {
+        self.showEditTag(true);
+        self.editingTag(tag);
+    }
 }
 
 //ko.bindingHandlers.addTagsPopover = {
@@ -101,6 +136,12 @@ function SearchViewModel() {
             });
         }
     };
+
+    self.newTagKeyUp = function (data, event) {
+        if (event.keyCode === 13) {
+            self.submitTags(data);
+        }
+    }
 }
 
 var viewModel = new SearchViewModel();

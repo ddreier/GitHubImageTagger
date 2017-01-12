@@ -41,13 +41,14 @@
                 <span class='tag tag-default tagBadge'>
                     <a class='tagLink' data-bind="text: content, attr: { href: '#' + content }"></a>
                     <span class='tagBadgeLinkContainer'>
-                        <a role='button' class='tagBadgeLink' onclick='showUpdateTag(this, imageId, item.tagId)'><i class='fa fa-pencil tagBadgeLinkEdit'></i></a>
+                        <a role='button' class='tagBadgeLink' @*onclick='showUpdateTag(this, imageId, item.tagId)'*@ data-bind="click: $parent.toggleShowEditTag"><i class='fa fa-pencil tagBadgeLinkEdit'></i></a>
                         <a role='button' class='tagBadgeLink' data-bind="click: $parent.deleteTag"><i class='fa fa-remove tagBadgeLinkRemove'></i></a>
                     </span>
                 </span>
             </span>
             <a role='button' class='addTagLink' data-bind="click: toggleShowNewTag, style: { color: newTagStatusColor }"><i class='fa fa-plus imageAddTagIcon'></i></a>
-            <div class='input-group' style="margin-top: .5rem;" data-bind="visible: showNewTag"><input type='text' class='form-control tagBox' placeholder='Enter tags, comma separated.' data-bind="value: newTags" /><span class='input-group-btn'><button class='btn btn-default' type='button' data-bind="click: $parent.submitTags"><i class='fa fa-check'></i></button></span></div>
+            <div class='input-group' style="margin-top: .5rem;" data-bind="visible: showNewTag"><input type='text' class='form-control tagBox' placeholder='Enter tags, comma separated.' data-bind="value: newTags, event: { keyup: $parent.newTagKeyUp }" /><span class='input-group-btn'><button class='btn btn-default' type='button' data-bind="click: $parent.submitTags"><i class='fa fa-check'></i></button></span></div>
+            <div class='input-group' style="margin-top: .5rem;" data-bind="visible: showEditTag"><input type='text' class='form-control tagBox' placeholder='Enter tags, comma separated.' data-bind="value: editingTag().content, event: { keyup: editTagKeyUp }" /><span class='input-group-btn'><button class='btn btn-default' type='button' data-bind="click: editTag"><i class='fa fa-pencil'></i></button></span></div>
         </div>
     </div>
 </div>
