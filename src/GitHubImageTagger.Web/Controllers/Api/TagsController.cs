@@ -41,7 +41,7 @@ namespace GitHubImageTagger.Controllers.Api
         public IEnumerable<Image> Search(string terms)
         {
             List<string> splitTerms = new List<string>();
-            Regex r = new Regex("([\"'])(?:(?=(\\\\?))\\2.)*?\\1");
+            Regex r = new Regex("([\"'])(?:(?=(\\\\?))\\2.)*?\\1"); // Pattern from http://stackoverflow.com/a/171499/390192
             var m = r.Matches(terms);
             foreach (Match match in m)
             {

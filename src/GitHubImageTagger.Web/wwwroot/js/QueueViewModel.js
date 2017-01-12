@@ -31,7 +31,7 @@ function QueueViewModel() {
         }
     };
 
-    $.getJSON("/api/images/untagged/take/15", function (allData) {
+    $.getJSON("/api/images/untagged/take/9", function (allData) {
         var mapped = $.map(allData, function (item) { return new Image(item.imageId, item.url, ""); });
         self.images(mapped);
     });
