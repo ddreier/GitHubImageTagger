@@ -58,17 +58,6 @@
     }
 }
 
-//ko.bindingHandlers.addTagsPopover = {
-//    init: function (element, valueAccessor, allBindingsAccessor, koViewModel, bindingContext) {
-//        var options = ko.utils.unwrapObservable(valueAccessor());
-//        var template = "<div class='input-group'><input type='text' class='form-control tagBox' placeholder='Enter tags, comma separated.' /><span class='input-group-btn'><button class='btn btn-default' type='button' data-bind='click: alert('hi')'><i class='fa fa-check'></i></button></span></div>";
-//        var defaultOptions = { html: true, content: template };
-//        options = $.extend(true, {}, defaultOptions, options);
-//        var pop = $(element).popover(options);
-//        ko.applyBindingsToDescendants(bindingContext, pop);
-//    }
-//}
-
 function SearchViewModel() {
     var self = this;
 
