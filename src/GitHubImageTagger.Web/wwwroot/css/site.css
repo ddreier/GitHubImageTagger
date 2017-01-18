@@ -80,6 +80,7 @@ textarea {
     /*padding: 10px;*/
     box-shadow: 0px 0px 6px #ddd;
     /*position: relative;*/
+    display: inline-block;
 }
 
 .imageAddTagIcon {
@@ -104,13 +105,13 @@ textarea {
 .tagBadge:hover {
     /*background-color: #555;*/
 }
-.tagBadge:hover .tagBadgeLinkContainer {
+/*.tagBadge:hover .tagBadgeLinkContainer {
     display: inline;
-}
+}*/
 
-.tagBadgeLinkContainer {
+/*.tagBadgeLinkContainer {
     display: none;
-}
+}*/
 
 .tagBadgeLink {
     color: #fff;

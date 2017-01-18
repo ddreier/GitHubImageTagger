@@ -31,9 +31,9 @@ namespace GitHubImageTagger.Controllers
         [Route("/queue")]
         public IActionResult Queue()
         {
-            List<Image> images = _context.Images.Where(i => i.Tags.Count == 0).OrderBy(i => Guid.NewGuid()).Take(15).ToList();
+            //List<Image> images = _context.Images.Where(i => i.Tags.Count == 0).OrderBy(i => Guid.NewGuid()).Take(15).ToList();
 
-            ViewBag.Images = images;
+            //ViewBag.Images = images;
 
             return View();
         }

@@ -1,7 +1,8 @@
 ﻿@using GitHubImageTagger.Core.Models
+@{ ViewBag.Title = "Untagged Image Queue"; }
 
 <script>
-    function submitTags(imageId) {
+    function submitTagsOld(imageId) {
         var tags = $("#tagBox" + imageId).val();
         var data = { tags: tags, imageId: imageId };
 
@@ -28,21 +29,18 @@
 
 </style>
 
-<h1 style="margin-top: 1rem; margin-bottom: 1rem;">Here's 15 untagged images</h1>
+<h1 style="margin-top: 1rem; margin-bottom: 1rem;">Here's <span data-bind="text: images().length"></span> untagged images</h1>
 
-<div class="card-columns">
-    @foreach (Image img in ViewBag.Images)
-    {
-        <div class="card imageBox" style="display: inline-block;">
-            <div class="card-block tagControls" style="padding: .5rem;">
-                <img class="card-img-top" style="width: 100%;" src="@img.Url" />
-                <div class="input-group" style="margin-top: .5rem;">
-                    <input id="tagBox@(img.ImageId)" type="text" class="form-control tagBox" placeholder="Enter tags, comma separated." />
-                    <span class="input-group-btn">
-                        <button id="tagSubmitBtn@(img.ImageId)" class="btn btn-default" type="button" onclick="submitTags(@(img.ImageId))"><i class="fa fa-check"></i></button>
-                    </span>
-                </div>
-            </div>
+<div class="card-columns" data-bind="foreach: images">
+    <div class="card imageBox" style="padding: .5rem;">
+        <img class="card-img-top" style="width: 100%" data-bind="attr: { src: url }" />
+        <div class="input-group" style="margin-top: .5rem;">
+            <input type="text" class="form-control tagBox" placeholder="Enter tags, comma separated." data-bind="value: tags, enable: editEnabled" />
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" data-bind="click: $parent.submitTags, enable: editEnabled, style: { color: updateStatusColor }"><i class="fa fa-check"></i></button>
+            </span>
         </div>
-    }
+    </div>
 </div>
+
+<script src="~/js/QueueViewModel.js"></script>

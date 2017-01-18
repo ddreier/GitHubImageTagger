@@ -7,6 +7,7 @@ using GitHubImageTagger.Web;
 using GitHubImageTagger.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using GitHubImageTagger.Core;
+using System.Text.RegularExpressions;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -39,13 +40,30 @@ namespace GitHubImageTagger.Controllers.Api
         [HttpGet("search")]
         public IEnumerable<Image> Search(string terms)
         {
+            List<string> splitTerms = new List<string>();
+            Regex r = new Regex("([\"'])(?:(?=(\\\\?))\\2.)*?\\1"); // Pattern from http://stackoverflow.com/a/171499/390192
+            var m = r.Matches(terms);
+            foreach (Match match in m)
+            {
+                string temp = match.Value.Substring(1, match.Value.Length - 2);
+                splitTerms = splitTerms.Append(temp).ToList<string>();
+                terms = terms.Replace(match.Value, "");
+            }
+
             char[] delimiters = { ' ', ',', '.' };
 
-            string[] splitTerms = terms.ToLower().Trim().Split(delimiters);
+            splitTerms.AddRange(terms.ToLower().Trim().Split(delimiters, StringSplitOptions.RemoveEmptyEntries));
 
-            var results = _context.Tags.Where(t => splitTerms.Any(s => t.Content.Contains(s))).Select(t => t.Image).Distinct();
+            if (splitTerms.Count > 0)
+            {
+                var results = _context.Tags.Where(t => splitTerms.Any(s => t.Content.Contains(s))).Select(t => t.Image).Distinct().Include(i => i.Tags);
 
-            return results;
+                return results;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         // POST api/values

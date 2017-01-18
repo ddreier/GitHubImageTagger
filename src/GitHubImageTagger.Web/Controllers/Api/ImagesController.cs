@@ -59,6 +59,12 @@ namespace GitHubImageTagger.Controllers.Api
             return _context.Images.Where(i => i.ImageId == id).Select(i => i.Tags).FirstOrDefault();
         }
 
+        [HttpGet("untagged/take/{count}")]
+        public IEnumerable<Image> UntaggedTake(int count)
+        {
+            return _context.Images.Where(i => i.Tags.Count == 0).OrderBy(i => Guid.NewGuid()).Take(count);
+        }
+
         // POST api/values
         //[HttpPost]
         //public void Post([FromBody]string value)
