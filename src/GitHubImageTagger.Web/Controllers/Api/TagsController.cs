@@ -66,6 +66,19 @@ namespace GitHubImageTagger.Controllers.Api
             }
         }
 
+        [HttpGet("top/{take?}")]
+        public object Top(int? take)
+        {
+            var grouping = _context.Tags.GroupBy(tag => tag.Content)
+                                        .Select(group => new { Content = group.Key, Count = group.Count() })
+                                        .OrderByDescending(g => g.Count);
+
+            if (take.HasValue)
+                return grouping.Take(take.Value);
+            else
+                return grouping;
+        }
+
         // POST api/values
         [HttpPost]
         public void Post(string tags, int imageId)
