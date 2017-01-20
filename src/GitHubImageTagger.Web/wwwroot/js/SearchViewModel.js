@@ -62,6 +62,7 @@ function SearchViewModel() {
     var self = this;
 
     self.images = ko.observableArray();
+    self.topTags = ko.observableArray();
 
     self.populateImages = function (terms) {
         $.ajax("/api/tags/search", {
@@ -130,7 +131,16 @@ function SearchViewModel() {
         if (event.keyCode === 13) {
             self.submitTags(data);
         }
-    }
+    };
+
+    self.populateTopTags = function () {
+        $.ajax('/api/tags/top/30', {
+            type: 'GET',
+            success: function (data, status, xhr) {
+                self.topTags(data);
+            }
+        });
+    };
 }
 
 var viewModel = new SearchViewModel();

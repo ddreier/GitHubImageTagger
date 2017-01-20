@@ -38,7 +38,7 @@
         <div class="card-block" style="padding: .5rem;">
             <img class="card-img-top" style="width: 100%" data-bind="attr: { src: url }" />
             <span data-bind="foreach: tags">
-                <span class='tag tag-default tagBadge'>
+                <span class='badge badge-default tagBadge'>
                     <a class='tagLink' data-bind="text: content, attr: { href: '#' + content }"></a>
                     <span class='tagBadgeLinkContainer'>
                         <a role='button' class='tagBadgeLink' @*onclick='showUpdateTag(this, imageId, item.tagId)'*@ data-bind="click: $parent.toggleShowEditTag"><i class='fa fa-pencil tagBadgeLinkEdit'></i></a>
@@ -51,6 +51,11 @@
             <div class='input-group' style="margin-top: .5rem;" data-bind="visible: showEditTag"><input type='text' class='form-control tagBox' placeholder='Enter tags, comma separated.' data-bind="value: editingTag().content, event: { keyup: editTagKeyUp }" /><span class='input-group-btn'><button class='btn btn-default' type='button' data-bind="click: editTag"><i class='fa fa-pencil'></i></button></span></div>
         </div>
     </div>
+</div>
+
+<h5>Top 30 tags</h5>
+<div id="tagsRow" data-bind="foreach: topTags">
+    <span class="badge badge-default tagBadge"><a class='tagLink' data-bind="text: content, attr: { href: '#' + content }"></a> <span class="badge badge-info tagBadge" data-bind="text: count"></span></span>
 </div>
 
 <div id="imageTemplate" class="card imageBox" style="display: none;">
@@ -68,6 +73,8 @@
             $("#tagSearchBox").val(window.location.hash.substr(1));
             doSearch();
         }
+
+        viewModel.populateTopTags();
     });
 
     $(window).on('hashchange', function () {
