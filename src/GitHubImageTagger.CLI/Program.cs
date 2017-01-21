@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace GitHubImageTagger.CLI
 {
@@ -12,63 +14,53 @@ namespace GitHubImageTagger.CLI
     {
         public static void Main(string[] args)
         {
+
+            GetNewImages();
+
+            Console.ReadLine();
+
+        }
+
+        private static async void GetNewImages()
+        {
             ApplicationDbContext _context = new ApplicationDbContext();
 
             HttpClient client = new HttpClient();
 
             client.BaseAddress = new Uri(@"https://api.github.com/");
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("githubimagetagger", "1.0"));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("githubimagetagger", "1.0"));
 
-            List<Image> toAdd = GetListFromApi(client, @"repos/snipe/animated-gifs/contents/");
+            List<Image> toAdd = await GetListFromApi(client, @"repos/snipe/animated-gifs/contents/");
             _context.Images.AddRange(toAdd);
 
             _context.SaveChanges();
             Console.WriteLine("Added " + toAdd.Count + " images");
 
-            // List file extensions
-            //List<string> extensions = new List<string>();
-            //foreach (var item in json.Where(j => j["type"].ToString() == "file"))
-            //{
-            //    string[] split = item["name"].ToString().Split('.');
-            //    extensions.Add(split[split.Length - 1]);
-            //}
-            //foreach (var item in extensions.GroupBy(s => s))
-            //{
-            //    Console.WriteLine("Extension: " + item.Key);
-            //}
-
-
-
-            //foreach (var type in json.Where(j => j["type"].ToString() == "dir"))
-            //{
-            //    Console.WriteLine(type["name"].ToString());
-            //}
-
-            Console.ReadLine();
             _context.Dispose();
         }
 
-        public static List<Image> GetListFromApi(HttpClient client, string requestPath)
+        public static async Task<List<Image>> GetListFromApi(HttpClient client, string requestPath)
         {
-            var thing = client.GetAsync(requestPath).Result;
+            Console.WriteLine($"Making HTTP call to {client.BaseAddress}{requestPath}");
+            HttpResponseMessage responseMessage = await client.GetAsync(requestPath);
 
-            if (thing.IsSuccessStatusCode)
+            if (responseMessage.IsSuccessStatusCode)
             {
-                string result = thing.Content.ReadAsStringAsync().Result;
+                string result = await responseMessage.Content.ReadAsStringAsync();
                 JToken json = JToken.Parse(result);
 
-                return AddImages(json, client);
+                return await AddImages(json, client);
             }
             else
             {
-                string reason = thing.Content.ReadAsStringAsync().Result;
+                string reason = await responseMessage.Content.ReadAsStringAsync();
                 Console.WriteLine($"Didn't get success for subDir {requestPath}: {reason}");
                 return new List<Image>();
             }
         }
 
-        public static List<Image> AddImages(JToken json, HttpClient client)
+        public static async Task<List<Image>> AddImages(JToken json, HttpClient client)
         {
             ApplicationDbContext _context = new ApplicationDbContext();
             List<Image> result = new List<Image>();
@@ -94,11 +86,9 @@ namespace GitHubImageTagger.CLI
                 }
                 else if (item["type"].ToString() == "dir")
                 {
-                    List<Image> dirImages = GetListFromApi(client, item["url"].ToString().Substring(22));
+                    List<Image> dirImages = await GetListFromApi(client, item["url"].ToString().Substring(22));
                     result.AddRange(dirImages);
                 }
-
-                
             }
 
             _context.Dispose();
